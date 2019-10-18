@@ -1,5 +1,5 @@
 {
-  "name": "ref",
+  "name": "@gpii/ref",
   "description": "Turn Buffer instances into \"pointers\"",
   "keywords": [
     "native",
@@ -22,7 +22,7 @@
   "author": "Nathan Rajlich <nathan@tootallnate.net> (http://tootallnate.net)",
   "repository": {
     "type": "git",
-    "url": "git://github.com/TooTallNate/ref.git"
+    "url": "git://github.com/GPII/ref.git"
   },
   "main": "./lib/ref.js",
   "scripts": {
