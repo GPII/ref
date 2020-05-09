@@ -250,7 +250,7 @@ NAN_METHOD(ReadPointer) {
 
   int64_t offset = GetInt64(info[1]);
   char *ptr = Buffer::Data(buf.As<Object>()) + offset;
-  size_t size = info[2]->Uint32Value(v8::Isolate::GetCurrent()->GetCurrentContext()).ToChecked();
+  size_t size = Nan::To<uint32_t>(info[2]).FromJust();
 
   if (ptr == NULL) {
     return Nan::ThrowError("readPointer: Cannot read from NULL pointer");
@@ -357,7 +357,7 @@ NAN_METHOD(WriteInt64) {
   } else if (in->IsString()) {
     char *endptr, *str;
     int base = 0;
-    String::Utf8Value _str(v8::Isolate::GetCurrent(), in);
+    String::Utf8Value _str(v8::Isolate::GetCurrent(),in);
     str = *_str;
 
     errno = 0;     /* To distinguish success/failure after call */
@@ -444,7 +444,7 @@ NAN_METHOD(WriteUInt64) {
   } else if (in->IsString()) {
     char *endptr, *str;
     int base = 0;
-    String::Utf8Value _str(v8::Isolate::GetCurrent(), in);
+    String::Utf8Value _str(v8::Isolate::GetCurrent(),in);
     str = *_str;
 
     errno = 0;     /* To distinguish success/failure after call */
@@ -518,7 +518,7 @@ NAN_METHOD(ReinterpretBuffer) {
     return Nan::ThrowError("reinterpret: Cannot reinterpret from NULL pointer");
   }
 
-  size_t size = info[1]->Uint32Value(v8::Isolate::GetCurrent()->GetCurrentContext()).ToChecked();
+  size_t size = Nan::To<uint32_t>(info[1]).FromJust();
 
   info.GetReturnValue().Set(WrapPointer(ptr, size));
 }
@@ -547,7 +547,7 @@ NAN_METHOD(ReinterpretBufferUntilZeros) {
     return Nan::ThrowError("reinterpretUntilZeros: Cannot reinterpret from NULL pointer");
   }
 
-  uint32_t numZeros = info[1]->Uint32Value(v8::Isolate::GetCurrent()->GetCurrentContext()).ToChecked();
+  uint32_t numZeros = Nan::To<uint32_t>(info[1]).FromJust();
   uint32_t i = 0;
   size_t size = 0;
   bool end = false;
@@ -648,15 +648,15 @@ NAN_MODULE_INIT(init) {
   Nan::SetMethod(target, "hexAddress", HexAddress);
   Nan::SetMethod(target, "isNull", IsNull);
   Nan::SetMethod(target, "readObject", ReadObject);
-  Nan::SetMethod(target, "writeObject", WriteObject);
+  Nan::SetMethod(target, "_writeObject", WriteObject);
   Nan::SetMethod(target, "readPointer", ReadPointer);
-  Nan::SetMethod(target, "writePointer", WritePointer);
+  Nan::SetMethod(target, "_writePointer", WritePointer);
   Nan::SetMethod(target, "readInt64", ReadInt64);
   Nan::SetMethod(target, "writeInt64", WriteInt64);
   Nan::SetMethod(target, "readUInt64", ReadUInt64);
   Nan::SetMethod(target, "writeUInt64", WriteUInt64);
   Nan::SetMethod(target, "readCString", ReadCString);
-  Nan::SetMethod(target, "reinterpret", ReinterpretBuffer);
-  Nan::SetMethod(target, "reinterpretUntilZeros", ReinterpretBufferUntilZeros);
+  Nan::SetMethod(target, "_reinterpret", ReinterpretBuffer);
+  Nan::SetMethod(target, "_reinterpretUntilZeros", ReinterpretBufferUntilZeros);
 }
 NODE_MODULE(binding, init);
