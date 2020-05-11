@@ -357,7 +357,7 @@ NAN_METHOD(WriteInt64) {
   } else if (in->IsString()) {
     char *endptr, *str;
     int base = 0;
-    String::Utf8Value _str(v8::Isolate::GetCurrent(),in);
+    String::Utf8Value _str(v8::Isolate::GetCurrent(), Nan::To<v8::String>(in).ToLocalChecked());
     str = *_str;
 
     errno = 0;     /* To distinguish success/failure after call */
@@ -444,7 +444,7 @@ NAN_METHOD(WriteUInt64) {
   } else if (in->IsString()) {
     char *endptr, *str;
     int base = 0;
-    String::Utf8Value _str(v8::Isolate::GetCurrent(),in);
+    String::Utf8Value _str(v8::Isolate::GetCurrent(), Nan::To<v8::String>(in).ToLocalChecked());
     str = *_str;
 
     errno = 0;     /* To distinguish success/failure after call */
@@ -573,90 +573,91 @@ NAN_METHOD(ReinterpretBufferUntilZeros) {
 
 NAN_MODULE_INIT(init) {
   Nan::HandleScope scope;
+  v8::Local<v8::Context> ctx = Nan::GetCurrentContext();
 
   // "sizeof" map
   Local<Object> smap = Nan::New<v8::Object>();
   // fixed sizes
-#define SET_SIZEOF(name, type) \
-  smap->Set(Nan::GetCurrentContext(), Nan::New<v8::String>( #name ).ToLocalChecked(), Nan::New<v8::Uint32>(static_cast<uint32_t>(sizeof(type))));
-  SET_SIZEOF(int8, int8_t);
-  SET_SIZEOF(uint8, uint8_t);
-  SET_SIZEOF(int16, int16_t);
-  SET_SIZEOF(uint16, uint16_t);
-  SET_SIZEOF(int32, int32_t);
-  SET_SIZEOF(uint32, uint32_t);
-  SET_SIZEOF(int64, int64_t);
-  SET_SIZEOF(uint64, uint64_t);
-  SET_SIZEOF(float, float);
-  SET_SIZEOF(double, double);
+#define SET_SIZEOF(context, name, type) \
+  smap->Set(v8::Local<v8::Context>(context), Nan::New<v8::String>( #name ).ToLocalChecked(), Nan::New<v8::Uint32>(static_cast<uint32_t>(sizeof(type))));
+  SET_SIZEOF(ctx, int8, int8_t);
+  SET_SIZEOF(ctx, uint8, uint8_t);
+  SET_SIZEOF(ctx, int16, int16_t);
+  SET_SIZEOF(ctx, uint16, uint16_t);
+  SET_SIZEOF(ctx, int32, int32_t);
+  SET_SIZEOF(ctx, uint32, uint32_t);
+  SET_SIZEOF(ctx, int64, int64_t);
+  SET_SIZEOF(ctx, uint64, uint64_t);
+  SET_SIZEOF(ctx, float, float);
+  SET_SIZEOF(ctx, double, double);
   // (potentially) variable sizes
-  SET_SIZEOF(bool, bool);
-  SET_SIZEOF(byte, unsigned char);
-  SET_SIZEOF(char, char);
-  SET_SIZEOF(uchar, unsigned char);
-  SET_SIZEOF(short, short);
-  SET_SIZEOF(ushort, unsigned short);
-  SET_SIZEOF(int, int);
-  SET_SIZEOF(uint, unsigned int);
-  SET_SIZEOF(long, long);
-  SET_SIZEOF(ulong, unsigned long);
-  SET_SIZEOF(longlong, long long);
-  SET_SIZEOF(ulonglong, unsigned long long);
-  SET_SIZEOF(pointer, char *);
-  SET_SIZEOF(size_t, size_t);
-  SET_SIZEOF(wchar_t, wchar_t);
+  SET_SIZEOF(ctx, bool, bool);
+  SET_SIZEOF(ctx, byte, unsigned char);
+  SET_SIZEOF(ctx, char, char);
+  SET_SIZEOF(ctx, uchar, unsigned char);
+  SET_SIZEOF(ctx, short, short);
+  SET_SIZEOF(ctx, ushort, unsigned short);
+  SET_SIZEOF(ctx, int, int);
+  SET_SIZEOF(ctx, uint, unsigned int);
+  SET_SIZEOF(ctx, long, long);
+  SET_SIZEOF(ctx, ulong, unsigned long);
+  SET_SIZEOF(ctx, longlong, long long);
+  SET_SIZEOF(ctx, ulonglong, unsigned long long);
+  SET_SIZEOF(ctx, pointer, char *);
+  SET_SIZEOF(ctx, size_t, size_t);
+  SET_SIZEOF(ctx, wchar_t, wchar_t);
   // size of a Persistent handle to a JS object
-  SET_SIZEOF(Object, Nan::Persistent<Object>);
+  SET_SIZEOF(ctx, Object, Nan::Persistent<Object>);
 
   // "alignof" map
   Local<Object> amap = Nan::New<v8::Object>();
-#define SET_ALIGNOF(name, type) \
+#define SET_ALIGNOF(context, name, type) \
   struct s_##name { type a; }; \
-  amap->Set(Nan::GetCurrentContext(), Nan::New<v8::String>( #name ).ToLocalChecked(), Nan::New<v8::Uint32>(static_cast<uint32_t>(__alignof__(struct s_##name))));
-  SET_ALIGNOF(int8, int8_t);
-  SET_ALIGNOF(uint8, uint8_t);
-  SET_ALIGNOF(int16, int16_t);
-  SET_ALIGNOF(uint16, uint16_t);
-  SET_ALIGNOF(int32, int32_t);
-  SET_ALIGNOF(uint32, uint32_t);
-  SET_ALIGNOF(int64, int64_t);
-  SET_ALIGNOF(uint64, uint64_t);
-  SET_ALIGNOF(float, float);
-  SET_ALIGNOF(double, double);
-  SET_ALIGNOF(bool, bool);
-  SET_ALIGNOF(char, char);
-  SET_ALIGNOF(uchar, unsigned char);
-  SET_ALIGNOF(short, short);
-  SET_ALIGNOF(ushort, unsigned short);
-  SET_ALIGNOF(int, int);
-  SET_ALIGNOF(uint, unsigned int);
-  SET_ALIGNOF(long, long);
-  SET_ALIGNOF(ulong, unsigned long);
-  SET_ALIGNOF(longlong, long long);
-  SET_ALIGNOF(ulonglong, unsigned long long);
-  SET_ALIGNOF(pointer, char *);
-  SET_ALIGNOF(size_t, size_t);
-  SET_ALIGNOF(wchar_t, wchar_t);
-  SET_ALIGNOF(Object, Nan::Persistent<Object>);
+  amap->Set(v8::Local<v8::Context>(context), Nan::New<v8::String>( #name ).ToLocalChecked(), Nan::New<v8::Uint32>(static_cast<uint32_t>(__alignof__(struct s_##name))));
+  SET_ALIGNOF(ctx, int8, int8_t);
+  SET_ALIGNOF(ctx, uint8, uint8_t);
+  SET_ALIGNOF(ctx, int16, int16_t);
+  SET_ALIGNOF(ctx, uint16, uint16_t);
+  SET_ALIGNOF(ctx, int32, int32_t);
+  SET_ALIGNOF(ctx, uint32, uint32_t);
+  SET_ALIGNOF(ctx, int64, int64_t);
+  SET_ALIGNOF(ctx, uint64, uint64_t);
+  SET_ALIGNOF(ctx, float, float);
+  SET_ALIGNOF(ctx, double, double);
+  SET_ALIGNOF(ctx, bool, bool);
+  SET_ALIGNOF(ctx, char, char);
+  SET_ALIGNOF(ctx, uchar, unsigned char);
+  SET_ALIGNOF(ctx, short, short);
+  SET_ALIGNOF(ctx, ushort, unsigned short);
+  SET_ALIGNOF(ctx, int, int);
+  SET_ALIGNOF(ctx, uint, unsigned int);
+  SET_ALIGNOF(ctx, long, long);
+  SET_ALIGNOF(ctx, ulong, unsigned long);
+  SET_ALIGNOF(ctx, longlong, long long);
+  SET_ALIGNOF(ctx, ulonglong, unsigned long long);
+  SET_ALIGNOF(ctx, pointer, char *);
+  SET_ALIGNOF(ctx, size_t, size_t);
+  SET_ALIGNOF(ctx, wchar_t, wchar_t);
+  SET_ALIGNOF(ctx, Object, Nan::Persistent<Object>);
 
   // exports
-  target->Set(Nan::New<v8::String>("sizeof").ToLocalChecked(), smap);
-  target->Set(Nan::New<v8::String>("alignof").ToLocalChecked(), amap);
-  Nan::ForceSet(target, Nan::New<v8::String>("endianness").ToLocalChecked(), Nan::New<v8::String>(CheckEndianness()).ToLocalChecked(), static_cast<PropertyAttribute>(ReadOnly|DontDelete));
-  Nan::ForceSet(target, Nan::New<v8::String>("NULL").ToLocalChecked(), WrapNullPointer(), static_cast<PropertyAttribute>(ReadOnly|DontDelete));
+  target->Set(ctx, Nan::New<v8::String>("sizeof").ToLocalChecked(), smap);
+  target->Set(ctx, Nan::New<v8::String>("alignof").ToLocalChecked(), amap);
+  Nan::DefineOwnProperty(target, Nan::New<v8::String>("endianness").ToLocalChecked(), Nan::New<v8::String>(CheckEndianness()).ToLocalChecked(), static_cast<PropertyAttribute>(ReadOnly|DontDelete));
+  Nan::DefineOwnProperty(target, Nan::New<v8::String>("NULL").ToLocalChecked(), WrapNullPointer(), static_cast<PropertyAttribute>(ReadOnly|DontDelete));
   Nan::SetMethod(target, "address", Address);
   Nan::SetMethod(target, "hexAddress", HexAddress);
   Nan::SetMethod(target, "isNull", IsNull);
   Nan::SetMethod(target, "readObject", ReadObject);
-  Nan::SetMethod(target, "_writeObject", WriteObject);
+  Nan::SetMethod(target, "writeObject", WriteObject);
   Nan::SetMethod(target, "readPointer", ReadPointer);
-  Nan::SetMethod(target, "_writePointer", WritePointer);
+  Nan::SetMethod(target, "writePointer", WritePointer);
   Nan::SetMethod(target, "readInt64", ReadInt64);
   Nan::SetMethod(target, "writeInt64", WriteInt64);
   Nan::SetMethod(target, "readUInt64", ReadUInt64);
   Nan::SetMethod(target, "writeUInt64", WriteUInt64);
   Nan::SetMethod(target, "readCString", ReadCString);
-  Nan::SetMethod(target, "_reinterpret", ReinterpretBuffer);
-  Nan::SetMethod(target, "_reinterpretUntilZeros", ReinterpretBufferUntilZeros);
+  Nan::SetMethod(target, "reinterpret", ReinterpretBuffer);
+  Nan::SetMethod(target, "reinterpretUntilZeros", ReinterpretBufferUntilZeros);
 }
 NODE_MODULE(binding, init);
